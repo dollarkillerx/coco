@@ -2,7 +2,6 @@ package coco
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -17,14 +16,15 @@ type ta2 struct {
 }
 
 func TestWrite(t *testing.T) {
-	client := NewClient(NewDefaultConfig("./out"))
+	now := time.Now()
+	client := NewClient(NewDefaultConfig("../out"))
 	collection, err := client.Database("test1").Collection("test1")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	rs := make([]interface{}, 0)
-	for i := 0; i < 20300; i++ {
+	for i := 0; i < 100000; i++ {
 		r := ta2{
 			Name:        fmt.Sprintf("scp-%d", i),
 			Age:         rand.Intn(600),
@@ -37,11 +37,14 @@ func TestWrite(t *testing.T) {
 		log.Fatalln(err)
 	}
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Millisecond * 1)
+	since := time.Since(now)
+	fmt.Println(since.Milliseconds()) // 195ms  =>  50W
 }
 
 func TestRead(t *testing.T) {
-	client := NewClient(NewDefaultConfig("./out"))
+	now := time.Now()
+	client := NewClient(NewDefaultConfig("../out"))
 	collection, err := client.Database("test1").Collection("test1")
 	if err != nil {
 		log.Fatalln(err)
@@ -57,6 +60,7 @@ func TestRead(t *testing.T) {
 	}
 	fmt.Println(find)
 	defer find.Close()
+	fmt.Println("s1: ", time.Since(now).Milliseconds())
 
 	rs := make([]ta2, 0)
 	all, err := find.All(context.TODO(), &rs)
@@ -64,11 +68,7 @@ func TestRead(t *testing.T) {
 		log.Fatalln(err)
 	}
 	fmt.Println(all)
-
-	marshal, err := json.Marshal(rs)
-	if err == nil {
-		log.Println(string(marshal))
-	}
+	fmt.Println("s2: ", time.Since(now).Milliseconds())
 
 	time.Sleep(time.Second)
 }
