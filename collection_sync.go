@@ -3,6 +3,7 @@ package coco
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -28,12 +29,33 @@ loop:
 			if !ex {
 				break loop
 			}
+			// 满了
 			if c.count >= c.conf.MaxSize {
 				open.Close()
-
+				open = c.nextNode(last)
+				c.count = 0
 			}
-
+			open.Write(append(data, '\n'))
+			c.count++
 		}
+	}
+}
+
+func (c *Collection) initLastPath() *collectionIdx {
+	idx := path.Join(c.pathRoot, "coco.idx")
+	marshal, err := json.Marshal(&collectionIdx{
+		LastPath: path.Join(c.pathRoot, "0.data"),
+		Idx:      0,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if err := ioutil.WriteFile(idx, marshal, 00666); err != nil {
+		log.Fatalln(err)
+	}
+	return &collectionIdx{
+		LastPath: path.Join(c.pathRoot, "0.data"),
+		Idx:      0,
 	}
 }
 
@@ -41,38 +63,17 @@ func (c *Collection) lastPath() *collectionIdx {
 	idx := path.Join(c.pathRoot, "coco.idx")
 	file, err := ioutil.ReadFile(idx)
 	if err != nil {
-		marshal, err := json.Marshal(&collectionIdx{
-			LastPath: path.Join(c.pathRoot, "0.data"),
-			Idx:      0,
-		})
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if err := ioutil.WriteFile(idx, marshal, 00666); err != nil {
-			log.Fatalln(err)
-		}
-		return &collectionIdx{
-			LastPath: path.Join(c.pathRoot, "0.data"),
-			Idx:      0,
-		}
+		return c.initLastPath()
 	}
+
+	if len(file) == 0 {
+		return c.initLastPath()
+	}
+
 	r := collectionIdx{}
 	if err := json.Unmarshal(file, &r); err != nil {
 		log.Println(err)
-		marshal, err := json.Marshal(&collectionIdx{
-			LastPath: path.Join(c.pathRoot, "0.data"),
-			Idx:      0,
-		})
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if err := ioutil.WriteFile(idx, marshal, 00666); err != nil {
-			log.Fatalln(err)
-		}
-		return &collectionIdx{
-			LastPath: path.Join(c.pathRoot, "0.data"),
-			Idx:      0,
-		}
+		return c.initLastPath()
 	}
 
 	return &r
@@ -102,6 +103,20 @@ func (c *Collection) docCount(filepath string) uint64 {
 	return count
 }
 
-func (c *Collection) nextNode(idx *collectionIdx) {
+func (c *Collection) nextNode(idx *collectionIdx) *os.File {
+	idx.Idx += 1
+	idx.LastPath = path.Join(c.pathRoot, fmt.Sprintf("%d.data", idx.Idx))
+	open, err := os.OpenFile(idx.LastPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 00666)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
+	marshal, err := json.Marshal(idx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if err := ioutil.WriteFile(path.Join(c.pathRoot, "coco.idx"), marshal, 00666); err != nil {
+		log.Fatalln(err)
+	}
+	return open
 }

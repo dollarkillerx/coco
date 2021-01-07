@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	//"gopkg.in/mgo.v2/bson"
 	"log"
 	"math/rand"
 	"os"
@@ -40,6 +41,54 @@ func TestFIleOut(t *testing.T) {
 		open.Write(append(marshal, +'\n'))
 	}
 }
+
+//func TestFIleBsonOut(t *testing.T) {
+//	open, err := os.Create("./out/fb.doc")
+//	if err != nil {
+//		log.Fatalln(err)
+//	}
+//	defer open.Close()
+//
+//	for i := 0; i < 100; i++ {
+//		rand.Seed(time.Now().UnixNano())
+//		r := ta{
+//			Name:        fmt.Sprintf("scp-%d", i),
+//			Age:         rand.Intn(600),
+//			Description: fmt.Sprintf("scp-NB-%d", i),
+//		}
+//		marshal, err := bson.Marshal(&r)
+//		if err != nil {
+//			log.Println(err)
+//			continue
+//		}
+//
+//		open.Write(append(marshal, +'\n'))
+//	}
+//}
+//
+//func TestRBsoni(t *testing.T) {
+//	open, err := os.Open("./out/fb.doc")
+//	if err != nil {
+//		log.Fatalln(err)
+//	}
+//	defer open.Close()
+//
+//	reader := bufio.NewReader(open)
+//
+//	for {
+//		bytes, err := reader.ReadBytes('\n')
+//		if err != nil {
+//			break
+//		}
+//		r := ta{}
+//		if err := bson.Unmarshal(bytes[:len(bytes)-1], &r); err != nil {
+//			log.Fatalln(err)
+//		}
+//
+//		fmt.Println(r)
+//	}
+//}
+
 
 func TestRi(t *testing.T) {
 	open, err := os.Open("./out/f.doc")

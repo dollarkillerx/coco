@@ -1,8 +1,19 @@
 package coco
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+)
 
-func (c *Collection) InsertMany(ctx context.Context, documents []interface{}) {
+func (c *Collection) InsertMany(ctx context.Context, documents []interface{}) error {
+	for _, v := range documents {
+		marshal, err := json.Marshal(v)
+		if err != nil {
+			return err
+		}
 
+		c.writeFile <- marshal
+	}
+
+	return nil
 }
-
