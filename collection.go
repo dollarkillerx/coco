@@ -3,6 +3,15 @@ package coco
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/google/uuid"
+	"io/ioutil"
+	"os"
+	"path"
+	"strings"
+
+	"github.com/dollarkillerx/async_utils"
+	"github.com/pkg/errors"
 )
 
 func (c *Collection) InsertMany(ctx context.Context, documents []interface{}) error {
@@ -16,4 +25,41 @@ func (c *Collection) InsertMany(ctx context.Context, documents []interface{}) er
 	}
 
 	return nil
+}
+
+func (c *Collection) Find(ctx context.Context, filter M) (*Cursor, error) {
+	// 先查询写临时表
+	paths, err := ioutil.ReadDir(c.pathRoot)
+	if err != nil {
+		return nil, errors.New("Collection 404")
+	}
+
+	over := make(chan bool)
+	poolFunc := async_utils.NewPoolFunc(int(c.conf.MaxReadPool), func() {
+		over <- true
+	})
+
+	tmpFile := path.Join(c.pathRoot, fmt.Sprintf("%s.tmp", uuid.New().String()))
+	s := newSearch(tmpFile)
+	for k := range paths {
+		idx := k
+		if !paths[idx].IsDir() && strings.Index(paths[idx].Name(), ".data") != -1 {
+			poolFunc.Send(func() {
+				s.Search(path.Join(c.pathRoot, paths[idx].Name()), filter)
+			})
+		}
+	}
+	poolFunc.Over()
+
+	<-over
+	s.Close()
+	return &Cursor{filePath: tmpFile}, nil
+}
+
+type Cursor struct {
+	filePath string
+}
+
+func (c *Cursor) Close() error {
+	return os.Remove(c.filePath)
 }

@@ -23,7 +23,7 @@ func TestWrite(t *testing.T) {
 	}
 
 	rs := make([]interface{}, 0)
-	for i := 0; i < 500; i++ {
+	for i := 0; i < 20000; i++ {
 		r := ta2{
 			Name:        fmt.Sprintf("scp-%d", i),
 			Age:         rand.Intn(600),
@@ -37,4 +37,21 @@ func TestWrite(t *testing.T) {
 	}
 
 	time.Sleep(time.Second * 10)
+}
+
+func TestRead(t *testing.T) {
+	client := NewClient(NewDefaultConfig("./out"))
+	collection, err := client.Database("test1").Collection("test1")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	find, err := collection.Find(context.TODO(), M{})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(find)
+	defer find.Close()
+
+	time.Sleep(time.Second)
 }

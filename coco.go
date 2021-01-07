@@ -52,4 +52,3 @@ func (d *Database) Collection(collection string) (*Collection, error) {
 	go c.collectionSynchronization()
 	return c, err
 }
-

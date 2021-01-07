@@ -14,3 +14,5 @@ func NewDefaultConfig(path string) *Conf {
 		MaxReadPool: 300,  // 默认读取线程数300
 	}
 }
+
+type M map[string]interface{}
