@@ -2,6 +2,7 @@ package coco
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -23,7 +24,7 @@ func TestWrite(t *testing.T) {
 	}
 
 	rs := make([]interface{}, 0)
-	for i := 0; i < 20000; i++ {
+	for i := 0; i < 20300; i++ {
 		r := ta2{
 			Name:        fmt.Sprintf("scp-%d", i),
 			Age:         rand.Intn(600),
@@ -46,12 +47,28 @@ func TestRead(t *testing.T) {
 		log.Fatalln(err)
 	}
 
-	find, err := collection.Find(context.TODO(), M{})
+	find, err := collection.Find(context.TODO(), M{
+		"age": M{
+			"$<": 300,
+		},
+	})
 	if err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println(find)
 	defer find.Close()
+
+	rs := make([]ta2, 0)
+	all, err := find.All(context.TODO(), &rs)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(all)
+
+	marshal, err := json.Marshal(rs)
+	if err == nil {
+		log.Println(string(marshal))
+	}
 
 	time.Sleep(time.Second)
 }

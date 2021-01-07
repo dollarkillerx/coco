@@ -4,13 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"io/ioutil"
-	"os"
 	"path"
 	"strings"
 
 	"github.com/dollarkillerx/async_utils"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -53,13 +52,5 @@ func (c *Collection) Find(ctx context.Context, filter M) (*Cursor, error) {
 
 	<-over
 	s.Close()
-	return &Cursor{filePath: tmpFile}, nil
-}
-
-type Cursor struct {
-	filePath string
-}
-
-func (c *Cursor) Close() error {
-	return os.Remove(c.filePath)
+	return &Cursor{tmpFile: tmpFile}, nil
 }

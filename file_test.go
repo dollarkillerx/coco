@@ -270,5 +270,131 @@ func TestFs(t *testing.T) {
 	fmt.Println("age_5: ", reflect.TypeOf(r["age_5"]).String())
 	fmt.Println("age_6: ", reflect.TypeOf(r["age_6"]).String())
 	fmt.Println("age_7: ", reflect.TypeOf(r["age_7"]).String())
+}
 
+func TestFs2(t *testing.T) {
+	type ft struct {
+		Name string  `json:"name"`
+		Age  int     `json:"age"`
+		Age2 int64   `json:"age_2"`
+		Age3 int32   `json:"age_3"`
+		Age4 uint32  `json:"age_4"`
+		Age5 uint64  `json:"age_5"`
+		Age6 float32 `json:"age_6"`
+		Age7 float64 `json:"age_7"`
+	}
+
+	log.SetFlags(log.LstdFlags | log.Llongfile)
+
+	results := make([]ft, 0)
+	//val := reflect.ValueOf(&results)
+	//fmt.Println(val.Kind())
+	//
+	//elem := val.Elem()
+	//fmt.Println(elem.Kind())
+	ex1(&results)
+}
+
+func ex(s interface{}) {
+	typ := reflect.TypeOf(s)
+	if typ.Kind() != reflect.Ptr {
+		log.Fatalln(typ.Kind())
+	}
+
+	//val := reflect.ValueOf(s)
+
+	// 获取数组元素类型
+	eleEE := typ.Elem().Elem()
+	// 获取数组值
+	//valEE := val.Elem()
+
+	// new 对象
+	item := reflect.New(eleEE)
+	// 对象值
+	itemVal := item.Elem()
+	name := itemVal.FieldByName("Name")
+	age := itemVal.FieldByName("Age")
+	name.SetString("dollarkiller")
+	age.SetInt(60)
+
+	//valEE.Set(item)
+}
+
+func ex1(s interface{}) {
+	typ := reflect.TypeOf(s)
+	if typ.Kind() != reflect.Ptr {
+		log.Fatalln(typ.Kind())
+	}
+
+	//val := reflect.ValueOf(s)
+
+	// 获取数组元素类型
+	eleEE := typ.Elem().Elem()
+	// 获取数组值
+	//valEE := val.Elem()
+	//fmt.Println(typ.Elem().Elem().Kind())
+	//of := reflect.ValueOf(eleEE)
+
+	// new 对象
+	//item := reflect.New(eleEE)
+	// 对象值
+	//itemVal := item.Elem()
+	//name := itemVal.FieldByName("Name")
+	//age := itemVal.FieldByName("Age")
+	//name.SetString("dollarkiller")
+	//age.SetInt(60)
+	for i := 0; i < eleEE.NumField(); i++ {
+		//if of.Field(i).CanInterface() {
+		fmt.Println(eleEE.Field(i).Name)
+		fmt.Println(eleEE.Field(i).Type.Kind())
+
+		//}
+	}
+
+	//valEE.Set(item)
+}
+
+type User struct {
+	Id   int
+	Name string
+}
+
+func ChangeSlice(s interface{}) {
+	sT := reflect.TypeOf(s)
+	if sT.Kind() != reflect.Ptr {
+		fmt.Println("参数必须是ptr类型")
+		os.Exit(-1)
+	}
+	sV := reflect.ValueOf(s)
+	// 取得数组中元素的类型
+	sEE := sT.Elem().Elem()
+	// 数组的值
+	sVE := sV.Elem()
+
+	// new一个数组中的元素对象
+	sON := reflect.New(sEE)
+	// 对象的值
+	sONE := sON.Elem()
+	// 给对象复制
+	sONEId := sONE.FieldByName("Id")
+	sONEName := sONE.FieldByName("Name")
+	sONEId.SetInt(10)
+	sONEName.SetString("李四")
+
+	// 创建一个新数组并把元素的值追加进去
+	newArr := make([]reflect.Value, 0)
+	newArr = append(newArr, sON.Elem())
+
+	// 把原数组的值和新的数组合并
+	resArr := reflect.Append(sVE, newArr...)
+
+	// 最终结果给原数组
+	sVE.Set(resArr)
+}
+
+func TestP2(t *testing.T) {
+	users := make([]User, 0)
+	ChangeSlice(&users)
+	// 这里希望让Users指向ChangeSlice函数中的那个新数组
+	fmt.Println(users)
 }

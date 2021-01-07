@@ -187,6 +187,8 @@ func (s *search) mFilter(item interface{}, filter M) bool {
 			if !s.mCompare("<", v, it) {
 				return false
 			}
+		default:
+			return false
 		}
 	}
 
@@ -194,84 +196,92 @@ func (s *search) mFilter(item interface{}, filter M) bool {
 }
 
 func (s *search) mCompare(symbol string, key interface{}, val float64) bool {
+	//find, err := collection.Find(context., M{
+	//	"age": M{
+	//		"$>": 300,
+	//	},
+	//})
+
+	// key 查询是输入大值  val: 300
+	// val 数据库中大值
 	switch k := key.(type) {
 	case int:
 		if symbol == ">" {
-			if float64(k) > val {
+			if float64(k) < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if float64(k) < val {
+			if float64(k) > val {
 				return true
 			}
 		}
 	case int32:
 		if symbol == ">" {
-			if float64(k) > val {
+			if float64(k) < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if float64(k) < val {
+			if float64(k) > val {
 				return true
 			}
 		}
 	case int64:
 		if symbol == ">" {
-			if float64(k) > val {
+			if float64(k) < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if float64(k) < val {
+			if float64(k) > val {
 				return true
 			}
 		}
 	case uint:
 		if symbol == ">" {
-			if float64(k) > val {
+			if float64(k) < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if float64(k) < val {
+			if float64(k) > val {
 				return true
 			}
 		}
 	case uint32:
 		if symbol == ">" {
-			if float64(k) > val {
+			if float64(k) < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if float64(k) < val {
+			if float64(k) > val {
 				return true
 			}
 		}
 	case uint64:
 		if symbol == ">" {
-			if float64(k) > val {
+			if float64(k) < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if float64(k) < val {
+			if float64(k) > val {
 				return true
 			}
 		}
 	case float32:
 		if symbol == ">" {
-			if float64(k) > val {
+			if float64(k) < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if float64(k) < val {
+			if float64(k) > val {
 				return true
 			}
 		}
 	case float64:
 		if symbol == ">" {
-			if k > val {
+			if k < val {
 				return true
 			}
 		} else if symbol == "<" {
-			if k < val {
+			if k > val {
 				return true
 			}
 		}
@@ -279,5 +289,5 @@ func (s *search) mCompare(symbol string, key interface{}, val float64) bool {
 		return false
 	}
 
-	return true
+	return false
 }
