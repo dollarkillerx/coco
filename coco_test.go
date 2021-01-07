@@ -51,8 +51,9 @@ func TestRead(t *testing.T) {
 	}
 
 	find, err := collection.Find(context.TODO(), M{
+		"name": "dollarkiller",
 		"age": M{
-			"$<": 300,
+			"$<": 30,
 		},
 	})
 	if err != nil {

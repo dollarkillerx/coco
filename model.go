@@ -10,7 +10,7 @@ type Conf struct {
 func NewDefaultConfig(path string) *Conf {
 	return &Conf{
 		Path:        path,
-		MaxSize:     5000, // 默认单文件5000
+		MaxSize:     200000, // 默认单文件5000
 		MaxReadPool: 300,  // 默认读取线程数300
 	}
 }
