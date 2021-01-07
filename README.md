@@ -62,3 +62,7 @@ if err != nil {
 		log.Println(string(marshal))
 	}
 ```
+
+### BateV1 Performance
+- Insert (7500 HHD)   50W/s
+- Search (7500 HHD No Index )   50W data full table scan time 100ms
