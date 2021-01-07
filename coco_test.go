@@ -24,7 +24,7 @@ func TestWrite(t *testing.T) {
 	}
 
 	rs := make([]interface{}, 0)
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 5000000; i++ {
 		r := ta2{
 			Name:        fmt.Sprintf("scp-%d", i),
 			Age:         rand.Intn(600),
