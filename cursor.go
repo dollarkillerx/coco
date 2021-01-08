@@ -3,12 +3,12 @@ package coco
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"reflect"
 
+	json "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 )
 

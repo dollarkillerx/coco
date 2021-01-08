@@ -2,8 +2,8 @@ package coco
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
+	json "github.com/json-iterator/go"
 	"reflect"
 
 	//"gopkg.in/mgo.v2/bson"

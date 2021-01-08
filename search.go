@@ -2,9 +2,10 @@ package coco
 
 import (
 	"bufio"
-	"encoding/json"
 	"log"
 	"os"
+
+	json "github.com/json-iterator/go"
 )
 
 type search struct {

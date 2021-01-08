@@ -61,7 +61,7 @@ func TestRead(t *testing.T) {
 		log.Fatalln(err)
 	}
 	fmt.Println(find)
-	//defer find.Close()
+	defer find.Close()
 	fmt.Println("s1: ", time.Since(now).Milliseconds())
 
 	rs := make([]ta2, 0)
