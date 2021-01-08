@@ -16,7 +16,6 @@ type ta2 struct {
 }
 
 func TestWrite(t *testing.T) {
-	now := time.Now()
 	client := NewClient(NewDefaultConfig("../out"))
 	collection, err := client.Database("test1").Collection("test1")
 	if err != nil {
@@ -32,6 +31,8 @@ func TestWrite(t *testing.T) {
 		}
 		rs = append(rs, r)
 	}
+
+	now := time.Now()
 	err = collection.InsertMany(context.TODO(), rs)
 	if err != nil {
 		log.Fatalln(err)
@@ -39,7 +40,7 @@ func TestWrite(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 1)
 	since := time.Since(now)
-	fmt.Println(since.Milliseconds()) // 195ms  =>  50W
+	fmt.Println(since.Milliseconds()) // 7325ms  =>  500W
 }
 
 func TestRead(t *testing.T) {
@@ -51,7 +52,7 @@ func TestRead(t *testing.T) {
 	}
 
 	find, err := collection.Find(context.TODO(), M{
-		"name": "dollarkiller",
+		//"name": "dollarkiller",
 		"age": M{
 			"$<": 30,
 		},
@@ -60,7 +61,7 @@ func TestRead(t *testing.T) {
 		log.Fatalln(err)
 	}
 	fmt.Println(find)
-	defer find.Close()
+	//defer find.Close()
 	fmt.Println("s1: ", time.Since(now).Milliseconds())
 
 	rs := make([]ta2, 0)

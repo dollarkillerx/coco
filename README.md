@@ -64,5 +64,5 @@ if err != nil {
 ```
 
 ### BateV1 Performance
-- Insert (7500 HHD)   30W/s
+- Insert (7500 HHD)   68W/s
 - Search (7500 HHD No Index )   500W data full table scan time 3s

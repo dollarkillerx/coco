@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"path"
 	"strings"
 
@@ -14,16 +15,29 @@ import (
 )
 
 func (c *Collection) InsertMany(ctx context.Context, documents []interface{}) error {
-	for _, v := range documents {
-		marshal, err := json.Marshal(v)
-		if err != nil {
-			return err
-		}
+	over := make(chan bool)
+	poolFunc := async_utils.NewPoolFunc(int(c.conf.MaxWritePool), func() {
+		close(over)
+	})
 
-		c.writeFile <- marshal
+	var err error
+	for k := range documents {
+		idx := k
+		poolFunc.Send(func() {
+			marshal, err := json.Marshal(documents[idx])
+			if err != nil {
+				err = err
+				log.Println(err)
+				return
+			}
+
+			c.writeFile <- marshal
+		})
 	}
+	poolFunc.Over()
 
-	return nil
+	<-over
+	return err
 }
 
 func (c *Collection) Find(ctx context.Context, filter M) (*Cursor, error) {
