@@ -35,15 +35,17 @@ func (s *search) file() {
 		log.Fatalln(err)
 	}
 	defer file.Close()
+	writer := bufio.NewWriter(file)
 loop:
 	for {
 		select {
 		case <-s.close:
 			break loop
 		case data := <-s.write:
-			if _, err := file.Write(data); err != nil {
+			if _, err := writer.Write(data); err != nil {
 				log.Println(err)
 			}
+			writer.Flush()
 		}
 	}
 }
