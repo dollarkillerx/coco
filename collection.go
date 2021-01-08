@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/dollarkillerx/async_utils"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"path"
 	"strings"
-
-	"github.com/dollarkillerx/async_utils"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 func (c *Collection) InsertMany(ctx context.Context, documents []interface{}) error {
@@ -66,5 +65,10 @@ func (c *Collection) Find(ctx context.Context, filter M) (*Cursor, error) {
 
 	<-over
 	s.Close()
+	s.Await()
+	dir, err := ioutil.ReadFile(tmpFile)
+	if err == nil {
+		log.Println("Dir: ",string(dir))
+	}
 	return &Cursor{tmpFile: tmpFile}, nil
 }

@@ -12,13 +12,15 @@ type search struct {
 	tmpPath string      // 临时文件路径
 	write   chan []byte // 写文件通道
 	close   chan bool
+	await   chan bool
 }
 
 func newSearch(tmpPath string) *search {
 	s := &search{
 		tmpPath: tmpPath,
-		write:   make(chan []byte, 0),
+		write:   make(chan []byte),
 		close:   make(chan bool),
+		await:   make(chan bool),
 	}
 
 	go s.file()
@@ -29,12 +31,24 @@ func (s *search) Close() {
 	close(s.close)
 }
 
+func (s *search) Await() {
+	for {
+		select {
+		case <-s.await:
+			return
+		}
+	}
+}
+
 func (s *search) file() {
 	file, err := os.OpenFile(s.tmpPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 00666)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer file.Close()
+	defer func() {
+		file.Close()
+		close(s.await)
+	}()
 	writer := bufio.NewWriter(file)
 loop:
 	for {
