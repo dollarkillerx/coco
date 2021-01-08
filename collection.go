@@ -66,9 +66,5 @@ func (c *Collection) Find(ctx context.Context, filter M) (*Cursor, error) {
 	<-over
 	s.Close()
 	s.Await()
-	dir, err := ioutil.ReadFile(tmpFile)
-	if err == nil {
-		log.Println("Dir: ",string(dir))
-	}
 	return &Cursor{tmpFile: tmpFile}, nil
 }
